@@ -1,0 +1,263 @@
+metadata:
+  config_version: phase0-v3
+  specification: credit_loss_project_plan_v9.md
+  status: provisional
+  description: Analyst assumptions; development gates remain pending.
+close_dates:
+  prior: '2026-06-30'
+  current: '2026-09-30'
+units:
+  balances: USD
+  loan_interest_rate: annual_decimal
+  mortgage_market_rate: annual_decimal
+  unemployment_rate: percent
+  house_price_growth: annualized_percent
+  ltv: percent
+  lgd: decimal_fraction
+  ccf: decimal_fraction
+  card_payment_rate: quarterly_decimal_fraction
+  scenario_weight: decimal_fraction
+methodology:
+  time_step: quarter
+  reasonable_supportable_quarters: 12
+  reversion_quarters: 4
+  proposed_reversion_method: linear_input_reversion
+  losses_discounted: false
+  loss_scope: principal_only
+  default_event: first_default
+  consumer_default_threshold_days: 90
+  supplementary_terminal_default_mapping: pending_release_review
+  existing_cases_receive_new_pd_charge: false
+  allow_negative_existing_case_acl: true
+  qualitative_base: pre_default_modeled_reserve_only
+  qualitative_components:
+  - funded
+  - unfunded
+pd_models:
+  directory: config/pd_model
+  approval_status: pending_model_development
+  initial_unemployment_center_percent: 4.5
+  centering_metadata_location: each_exported_coefficient_file
+  center_is_reversion_target: false
+historical_reversion:
+  status: pending_data_and_benchmark
+  reference_start: 2000Q1
+  reference_end: 2019Q4
+  unemployment:
+    source: BLS_UNRATE_via_FRED
+    transformation: quarterly_mean_of_monthly_seasonally_adjusted_rates
+    reference_weighting: equal_quarter
+    target_percent: null
+    source_vintage: null
+  house_price_growth:
+    source: national_FHFA_HPI
+    transformation: 100 * ((HPI_t / HPI_previous_quarter) ** 4 - 1)
+    reference_weighting: equal_quarter
+    target_annualized_percent: null
+    source_vintage: null
+  benchmark:
+    status: pending
+    decision_record: docs/assumption_review.md
+    threshold_configuration: reserve_impact_review
+launch_references:
+  q2_unemployment:
+    monthly_values_percent:
+      april: 4.3
+      may: 4.3
+      june: 4.2
+    calculation: arithmetic_mean_of_three_months
+    provenance: frozen_reference_in_project_specification
+    independent_source_capture_status: pending
+    specification_reference_date: '2026-10-01'
+    real_time_forecast_claim: false
+  q2_house_price_growth:
+    annualized_percent: 3.0
+    provenance: synthetic_project_anchor
+  house_price_index_at_launch: 1.0
+lgd:
+  status: illustrative
+  segment_constants:
+    commercial_term: 0.35
+    commercial_revolver: 0.4
+    auto: 0.5
+    card: 0.85
+    residential_mortgage: 0.25
+  mortgage:
+    selection_status: pending_matched_event_benchmark
+    provisional_form: constant
+    insurance_benefits_assumed: false
+    sensitivity_configuration: lgd.sensitivity_values
+  sensitivity_values:
+    base_multipliers:
+    - 0.8
+    - 1.0
+    - 1.2
+    maximum_lgd: 1.0
+    report_actual_lgd_values_used: true
+    mortgage_high_case:
+      before_benchmark: provisional_1.2_multiplier
+      after_benchmark: matched_event_downturn_cohort_severity
+      first_default_years:
+      - 2008
+      - 2009
+      - 2010
+      - 2011
+      benchmark_status: pending
+      require_matching_principal_and_recovery_target: true
+      require_followup_and_censoring_assessment: true
+      preserve_conditional_lgd_consistency: true
+      do_not_force_benchmark_above_base: true
+  sensitivity_status: prespecified_with_mortgage_benchmark_replacement_pending
+ccf:
+  commercial_revolver: 0.5
+  status: illustrative
+  sensitivity_values:
+  - 0.25
+  - 0.5
+  - 0.75
+  sensitivity_status: prespecified_illustrative
+cards:
+  borrower_scope: revolving_borrowers
+  future_purchases_or_redraws: false
+  unused_commitment_reserved: false
+  imposed_maturity: false
+  payment_group_fixed_within_forecast: true
+  base_groups_unchanged_between_closes: true
+  launch_utilization_frozen_within_forecast: true
+  quarterly_principal_payment_rates:
+    slow: 0.06
+    intermediate: 0.12
+    fast: 0.18
+  payment_rates_status: illustrative
+  payment_sensitivities:
+    lower_base_higher_rates_by_group:
+      slow:
+      - 0.045
+      - 0.06
+      - 0.075
+      intermediate:
+      - 0.09
+      - 0.12
+      - 0.15
+      fast:
+      - 0.135
+      - 0.18
+      - 0.225
+    alternative_group_mixes: null
+    status: rate_cases_prespecified_group_mix_pending
+    multipliers:
+    - 0.75
+    - 1.0
+    - 1.25
+  numerical_tail:
+    checkpoints_quarters:
+    - 20
+    - 40
+    - 60
+    relative_loss_tolerance: 0.01
+    absolute_loss_tolerance_usd: 1.0
+    absolute_tolerance_scope: card_segment_per_scenario
+    bound: remaining_unconditional_performing_principal
+    transfer_residual_mass_to_paid_off: false
+    runtime_max_quarters: 400
+    runtime_max_status: initial_computational_guard
+    fail_if_runtime_limit_reached_without_tail_pass: true
+    threshold_rule: max(absolute_usd, relative * accumulated_EL)
+    check_each_scenario_and_weighted_result: true
+workouts:
+  configuration_directory: config/workout_model
+  approval_status: pending_profile_prototype
+  preserve_event_severity_lineage: true
+  future_realized_generator_schedules_allowed: false
+  remaining_allowance_method: mechanical_profile_remeasurement
+  conventions_file: config/workout_model/conventions.yaml
+scenario_weights:
+  2026Q2:
+    upside: 0.15
+    baseline: 0.45
+    downside: 0.3
+    severe: 0.1
+  2026Q3:
+    upside: 0.1
+    baseline: 0.45
+    downside: 0.3
+    severe: 0.15
+qualitative_percentages:
+  2026Q2:
+    commercial_term: 0.05
+    commercial_revolver: 0.05
+    auto: 0.0
+    card: 0.0
+    residential_mortgage: 0.0
+  2026Q3:
+    commercial_term: 0.06
+    commercial_revolver: 0.06
+    auto: 0.0
+    card: 0.0
+    residential_mortgage: 0.0
+  card_overlay_status: pending_monitoring_evidence
+validation_tolerances:
+  status: initial_project_choices
+  probability_absolute: 1.0e-10
+  probability_scope:
+  - each_transition_row
+  - each_projected_state_vector
+  scenario_weight_sum_absolute: 1.0e-08
+  scenario_weight_minimum: 0.0
+  scenario_weight_maximum: 1.0
+  principal_reconciliation_cents: 0
+  principal_reconciliation_usd: 0.0
+  principal_scope:
+  - loan
+  - workout_case
+  - segment
+  - portfolio
+  reserve_reconciliation_usd: 0.01
+  reserve_scope: each_reported_component_using_unrounded_engine_values
+  recentering_probability_absolute: 1.0e-10
+  scenario_anchor_absolute_percentage_points: 0.1
+sequential_walk:
+  driver_order:
+  - A
+  - X
+  - E
+  - M
+  - N
+  - S
+  - W
+  - Q
+  run_count: 9
+  attribution_is_causal: false
+  attribution_is_order_independent: false
+monetary_storage:
+  generated_monetary_fields: whole_cents
+  csv_currency_encoding: USD_fixed_two_decimal_places
+  principal_arithmetic: integer_cents
+  closing_balances_derived_from_rounded_flows: true
+  rounding_method: decimal_ROUND_HALF_UP
+  engine_reserve_arithmetic: unrounded
+  currency_exports: round_to_cents_after_validation
+  display_rounding_used_in_validation: false
+  rounded_table_footing_must_be_documented: true
+reserve_impact_review:
+  status: prespecified_project_thresholds
+  reference: documented_comparator_reserve_for_the_same_scope
+  threshold_rule: max(absolute_usd, relative * abs(reference_reserve))
+  comparison: absolute_difference_strictly_exceeds_threshold
+  reporting:
+    absolute_usd: 1000.0
+    relative: 0.01
+  investigation:
+    absolute_usd: 5000.0
+    relative: 0.05
+    sampling_interval_coverage: 0.9
+    sampling_condition: difference_interval_excludes_zero
+    unavailable_interval: unresolved_requires_documented_review
+  scope:
+  - segment_funded
+  - segment_unfunded
+  - segment_combined
+  - portfolio_funded
+  - portfolio_unfunded
+  - portfolio_combined
+  thresholds_do_not_automatically_approve_models: true

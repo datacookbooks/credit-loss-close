@@ -1,0 +1,69 @@
+metadata:
+  config_version: phase0-v1
+  status: provisional
+  role: analyst_expected_workout_conventions
+  base_profiles_status: pending_prototype
+
+units:
+  principal: USD
+  accounting_arithmetic: integer_cents
+  expected_reserves: unrounded_USD
+  lgd_and_remeasurement_ratios: decimal_fraction
+  lag: quarters_after_first_default
+
+timing:
+  default_quarter_index: 0
+  first_following_quarter_index: 1
+  chargeoff_date_equals_confirmed_uncollectibility_date: true
+  recovery_requires_prior_matched_chargeoff: true
+  require_at_least_one_later_quarter_recovery: true
+  contractual_maturity_forces_workout_payoff: false
+  base_segment_profiles: null
+
+identities:
+  final_principal_budget: "event_EAD = collections + gross_chargeoffs"
+  ultimate_loss: "gross_chargeoffs - post_chargeoff_recoveries"
+  equivalent_loss: "event_EAD - collections - post_chargeoff_recoveries"
+  remaining_UPB: "event_EAD - cumulative_collections - cumulative_chargeoffs"
+  expected_net_loss: "expected_G_total - expected_R_total = event_EAD * LGD"
+  case_ACL: "expected_G_future - expected_R_future"
+
+remeasurement:
+  rule_version: mechanical-profile-v1
+  preserve_event_severity_and_model_lineage: true
+  ratios:
+    - g
+    - r_old
+    - r_new
+  ratio_minimum: 0.0
+  ratio_maximum: 1.0
+  zero_denominator_fallback: last_age_with_positive_denominator_for_that_ratio
+  no_supported_fallback: blocking_requires_documented_profile_decision
+  zero_actual_exposure_requires_no_ratio_application: true
+  overrides_require_dated_reason_and_reserve_impact: true
+
+recovery_constraints:
+  previously_received_recoveries_counted_again: false
+  capacity: unrecovered_prior_writeoffs_plus_expected_future_writeoffs
+  recoveries_reduce_UPB_again: false
+  negative_recovery_only_allowance_allowed: true
+
+timing_sensitivity:
+  shifts_quarters: [-2, 0, 2]
+  shift_collections_chargeoffs_and_recoveries: true
+  minimum_event_quarter_index: 0
+  preserve_matched_chargeoff_recovery_order: true
+  preserve_required_later_quarter_recovery: true
+  preserve_lifetime_principal_and_net_loss_totals: true
+  alter_already_observed_events: false
+  remaining_forecasts_must_not_schedule_events_before_as_of_date: true
+  conditioning_method: mechanical_remeasurement_using_as_of_facts
+
+information_boundary:
+  realized_future_generator_schedules_allowed: false
+  realized_ultimate_generator_loss_allowed: false
+  existing_cases_receive_new_pd_charge: false
+
+sensitivities_pending:
+  recovery_share_cases: null
+  base_segment_collection_chargeoff_recovery_profiles: null
