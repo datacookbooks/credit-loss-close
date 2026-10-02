@@ -1,0 +1,16 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+.venv/
+
+# Downloaded and generated data
+/data/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# macOS
+.DS_Store
