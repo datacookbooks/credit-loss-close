@@ -1,0 +1,175 @@
+metadata:
+  config_version: phase0-v2
+  specification: credit_loss_project_plan_v9.md
+  status: provisional
+  role: synthetic_world_and_upstream_delivery
+  readable_by_close: false
+random_seed: 20260930
+portfolio:
+  q2_target_counts:
+    commercial_term: 400
+    commercial_revolver: 300
+    auto: 800
+    card: 500
+    residential_mortgage: 600
+  q3_new_origination_count_fraction: 0.08
+  opening_workout_mix: null
+  opening_workout_mix_status: pending_profile_design
+development:
+  synthetic_start_quarter: 2000Q1
+  synthetic_end_quarter: 2026Q2
+  mortgage_performance_cutoff: '2025-09-30'
+  total_originated_loan_targets:
+    commercial_term: 5000
+    commercial_revolver: 5000
+    auto: 20000
+    card: 20000
+  policy_support_start_quarter: 2020Q2
+  policy_support_end_quarter: 2021Q4
+  estimation_exclusion_start_quarter: 2020Q1
+  estimation_exclusion_end_quarter: 2021Q4
+  policy_support_dampening_parameters: null
+true_transition_models:
+  parameter_status: pending_development_generator_design
+  unemployment_center_percent: 4.5
+  calibration_reference_unemployment_percent: 4.5
+  parameters: null
+  commercial_grade_migration_depends_on_economy: true
+  card_covariates:
+  - risk_grade_group
+  - start_utilization
+  - payment_group
+  card_payment_group_reference: intermediate
+  core_card_coefficient_shift_enabled: false
+  mortgage:
+    basis: approved_estimated_mortgage_model
+    coefficient_file: config/pd_model/residential_mortgage.yaml
+    perturbations: null
+    perturbation_status: pending_after_mortgage_estimation
+illustrative_annual_default_targets:
+  grade_order:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  commercial:
+  - 0.001
+  - 0.0025
+  - 0.005
+  - 0.01
+  - 0.02
+  - 0.04
+  - 0.08
+  - 0.15
+  auto:
+  - 0.003
+  - 0.006
+  - 0.01
+  - 0.018
+  - 0.03
+  - 0.05
+  - 0.08
+  - 0.12
+  card:
+  - 0.008
+  - 0.015
+  - 0.025
+  - 0.04
+  - 0.06
+  - 0.09
+  - 0.13
+  - 0.2
+  interpretation: generator_calibration_targets_not_analyst_pd_inputs
+cards:
+  future_draws_enabled: false
+  imposed_maturity: false
+  payment_groups:
+  - slow
+  - intermediate
+  - fast
+  payment_group_shares: null
+  group_assignment_relationships: null
+  true_quarterly_payment_rates:
+    slow: 0.06
+    intermediate: 0.12
+    fast: 0.18
+  payment_rates_status: illustrative_starting_values
+  survivor_groups_change_between_closes: false
+realized_q3_macro:
+  unemployment_rate_percent: 4.9
+  unemployment_provenance: synthetic_project_realization
+  house_price_growth_annualized_percent: 3.0
+  house_price_provenance: synthetic_q2_baseline_h1
+  historical_to_synthetic_boundary: after_2026Q2
+scenarios:
+  unemployment_surprise_decay_rho: 0.8
+  q2_house_price_starting_growth_annualized_percent: 3.0
+  house_price_anchors_annualized_percent:
+    upside:
+      2026Q4: 4.5
+      2027Q4: 4.0
+      2028Q4: 3.5
+    baseline:
+      2026Q4: 3.0
+      2027Q4: 3.0
+      2028Q4: 3.0
+    downside:
+      2026Q4: 0.0
+      2027Q4: 1.0
+      2028Q4: 2.5
+    severe:
+      2026Q4: -8.0
+      2027Q4: -4.0
+      2028Q4: 1.0
+mortgage_launch:
+  market_rate_annual_decimal: null
+  market_rate_status: pending_explicit_synthetic_choice
+  market_rate_equal_at_both_closes: true
+private_workout_generation:
+  severity_distribution: bounded_distribution_pending_selection
+  severity_distribution_parameters: null
+  timing_profiles: null
+  confirmed_writeoffs_dated_separately_from_closure: true
+  recoveries_require_prior_matched_writeoff: true
+  private_future_schedules_delivered_to_analyst: false
+  private_realized_ultimate_losses_delivered_to_analyst: false
+optional_card_low_power_experiment:
+  enabled: false
+  separate_from_core_generation: true
+  change_quarter: 2025Q3
+  unemployment_coefficient_before: 0.3
+  unemployment_coefficient_after: 0.35
+  random_seed: null
+validation:
+  tolerances:
+    status: initial_project_choices
+    probability_absolute: 1.0e-10
+    probability_scope:
+    - each_transition_row
+    - each_projected_state_vector
+    scenario_weight_sum_absolute: 1.0e-08
+    scenario_weight_minimum: 0.0
+    scenario_weight_maximum: 1.0
+    principal_reconciliation_cents: 0
+    principal_reconciliation_usd: 0.0
+    principal_scope:
+    - loan
+    - workout_case
+    - segment
+    - portfolio
+    reserve_reconciliation_usd: 0.01
+    reserve_scope: each_reported_component_using_unrounded_engine_values
+    recentering_probability_absolute: 1.0e-10
+    scenario_anchor_absolute_percentage_points: 0.1
+  status: initial_project_choices
+  freeze_full_close_generator_before_development_gates: false
+monetary_storage:
+  generated_monetary_fields: whole_cents
+  csv_currency_encoding: USD_fixed_two_decimal_places
+  principal_arithmetic: integer_cents
+  closing_balances_derived_from_rounded_flows: true
+  rounding_method: decimal_ROUND_HALF_UP
